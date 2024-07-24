@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Middleware to verify JWT
 const verifyToken = (req, res, next) => {

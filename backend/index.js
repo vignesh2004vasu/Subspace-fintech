@@ -1,16 +1,16 @@
+require('dotenv').config();
+const JWT_SECRET = process.env.JWT_SECRET;
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('./database');
 const cors = require('cors');
-require('dotenv').config();
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
-
-const JWT_SECRET = process.env.JWT_SECRET;
 
 // Middleware to verify JWT
 const verifyToken = (req, res, next) => {

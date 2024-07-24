@@ -29,11 +29,19 @@ app.post('/register', async (req, res) => {
   const { username, password, email } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const result = await db.query(
+    const userResult = await db.query(
       'INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING id',
       [username, hashedPassword, email]
     );
-    res.json({ message: 'User registered successfully', userId: result.rows[0].id });
+    const userId = userResult.rows[0].id;
+
+    const accountResult = await db.query(
+      'INSERT INTO accounts (user_id) VALUES ($1) RETURNING id',
+      [userId]
+    );
+    const accountId = accountResult.rows[0].id;
+
+    res.json({ message: 'User registered and account created successfully', userId, accountId });
   } catch (error) {
     res.status(400).json({ error: 'Registration failed' });
   }
@@ -56,19 +64,6 @@ app.post('/login', async (req, res) => {
     res.json({ token });
   } catch (error) {
     res.status(400).json({ error: 'Login failed' });
-  }
-});
-
-// Create account
-app.post('/accounts', verifyToken, async (req, res) => {
-  try {
-    const result = await db.query(
-      'INSERT INTO accounts (user_id) VALUES ($1) RETURNING id',
-      [req.userId]
-    );
-    res.json({ accountId: result.rows[0].id });
-  } catch (error) {
-    res.status(400).json({ error: 'Failed to create account' });
   }
 });
 
@@ -117,6 +112,24 @@ app.post('/withdraw', verifyToken, async (req, res) => {
     res.status(400).json({ error: 'Withdrawal failed' });
   }
 });
+
+
+// Fetch account details
+app.get('/account-details', verifyToken, async (req, res) => {
+  try {
+    const result = await db.query(
+      'SELECT id, balance FROM accounts WHERE user_id = $1',
+      [req.userId]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No account found' });
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(400).json({ error: 'Failed to fetch account details' });
+  }
+});
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

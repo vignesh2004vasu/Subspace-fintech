@@ -1,41 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-const Login = ({ showMessage, setToken }) => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await fetch('http://localhost:3000/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Something went wrong');
-            setToken(data.token);
-            localStorage.setItem('token', data.token);
-            showMessage('Login successful');
-        } catch (error) {
-            showMessage(error.message, true);
-        }
-    };
-
-    return (
-        <>
-        
-        
-        <div className="section">
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" required />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
-                <button type="submit">Login</button>
-            </form>
+const Navbar = () => (
+    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+        <Link className="navbar-brand" to="/">Fintech Platform</Link>
+        <div className="collapse navbar-collapse" id="navbarNav">
+            <ul className="navbar-nav">
+                <li className="nav-item">
+                    <Link className="nav-link" to="/register">Create Account</Link>
+                </li>
+                <li className="nav-item">
+                    <Link className="nav-link" to="/login">Login</Link>
+                </li>
+                
+                <li className="nav-item">
+                    <Link className="nav-link" to="/deposit">Deposit</Link>
+                </li>
+                <li className="nav-item">
+                    <Link className="nav-link" to="/withdraw">Withdraw</Link>
+                </li>
+            </ul>
         </div>
-        </>
-    );
-};
+    </nav>
+);
 
-export default Login;
+export default Navbar;
